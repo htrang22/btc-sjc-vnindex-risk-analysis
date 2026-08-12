@@ -18,7 +18,7 @@ Phân tích cũng sử dụng các kiểm định ADF, Phillips–Perron, KPSS, 
 
 ## Cách chạy
 
-Mở notebook bằng Jupyter Notebook hoặc Google Colab, đặt ba file CSV cùng thư mục và chạy lần lượt các cell từ trên xuống. Cell đầu notebook sẽ cài các thư viện Python cần thiết.
+Notebook đã được kiểm tra với **Python 3.14.5**. Mở notebook bằng Jupyter Notebook hoặc Google Colab, đặt ba file CSV cùng thư mục và chạy lần lượt các cell từ trên xuống. Cell đầu notebook sẽ cài đúng phiên bản các thư viện Python cần thiết. Ngoài ra, có thể chuẩn bị môi trường trước bằng lệnh `pip install -r requirements.txt`.
 
 ## Ý nghĩa kinh tế thực tiễn
 
