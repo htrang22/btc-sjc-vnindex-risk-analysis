@@ -1,0 +1,30 @@
+# Econometrics: Phân tích rủi ro và liên kết tài chính
+
+Dự án phân tích lợi suất và biến động của ba tài sản tại Việt Nam: **Bitcoin (quy đổi VND), vàng SJC và VN-Index**.
+
+Notebook chính, [`file_bai_lam (1).ipynb`](./file_bai_lam%20(1).ipynb), gồm ba phần:
+
+1. **ARMA–EGARCH:** ước lượng lợi suất và biến động có điều kiện của từng tài sản.
+2. **DCC–GARCH:** phân tích tương quan động giữa các cặp tài sản.
+3. **Diebold–Yılmaz:** đo lường mức độ và hướng lan truyền rủi ro bằng VAR và GFEVD.
+
+Phân tích cũng sử dụng các kiểm định ADF, Phillips–Perron, KPSS, Zivot–Andrews, Ljung–Box và ARCH-LM; đồng thời kiểm tra độ vững theo nhiều kỳ dự báo.
+
+## Dữ liệu
+
+- `3y-bitcoin-vnd-returns.csv`: giá và lợi suất Bitcoin theo VND.
+- `3y-gold-returns.csv`: giá và lợi suất vàng SJC.
+- `3y-vnindex-returns.csv`: chỉ số và lợi suất VN-Index.
+
+## Cách chạy
+
+Mở notebook bằng Jupyter Notebook hoặc Google Colab, đặt ba file CSV cùng thư mục và chạy lần lượt các cell từ trên xuống. Cell đầu notebook sẽ cài các thư viện Python cần thiết.
+
+## Ý nghĩa kinh tế thực tiễn
+
+- **Định lượng rủi ro riêng của từng tài sản:** Bitcoin có mức biến động trung bình cao nhất, trong khi vàng SJC có độ dai dẳng biến động rất lớn. VN-Index nhìn chung ổn định hơn nhưng có thể xuất hiện các đợt tăng vọt; tin xấu còn làm biến động của chỉ số tăng mạnh hơn tin tốt cùng độ lớn. Kết quả này hữu ích cho việc đặt hạn mức rủi ro, điều chỉnh tỷ trọng và xây dựng kịch bản stress test.
+- **Hỗ trợ đa dạng hóa danh mục:** tương quan giữa BTC, vàng SJC và VN-Index nhìn chung dương nhưng rất thấp, cho thấy việc kết hợp ba tài sản có thể mang lại lợi ích đa dạng hóa trong giai đoạn nghiên cứu. Tuy nhiên, tương quan không hoàn toàn cố định và có thể tăng ở một số thời điểm, nên nhà đầu tư không nên xem lợi ích phòng hộ là bất biến.
+- **Nhận diện kênh truyền rủi ro:** ở kỳ dự báo 10 ngày, mức liên kết toàn hệ thống tương đối thấp (`TCI = 4,17%`), nghĩa là biến động chủ yếu đến từ cú sốc riêng của từng thị trường. Dù vậy, VN-Index là bên truyền rủi ro ròng, còn vàng SJC là bên tiếp nhận mạnh nhất; kênh `VN-Index → SJC` trở nên rõ hơn khi kéo dài kỳ dự báo.
+- **Phân biệt rủi ro ngắn hạn và dài hạn:** chỉ số kết nối tăng từ `1,45%` ở kỳ 5 ngày lên `7,63%` ở kỳ 20 ngày. Vì vậy, giám sát từng thị trường có thể phù hợp trong ngắn hạn, nhưng quản trị danh mục trung và dài hạn cần tính đến tác động lan truyền tích lũy giữa các tài sản.
+
+Các kết luận trên phản ánh mẫu dữ liệu và đặc tả mô hình của dự án, có ý nghĩa hỗ trợ phân tích và quản trị rủi ro hơn là một khuyến nghị đầu tư trực tiếp.
