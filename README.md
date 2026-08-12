@@ -2,7 +2,7 @@
 
 Dự án phân tích lợi suất và biến động của ba tài sản tại Việt Nam: **Bitcoin (quy đổi VND), vàng SJC và VN-Index**.
 
-Notebook chính, [`file_bai_lam (1).ipynb`](./file_bai_lam%20(1).ipynb), gồm ba phần:
+Notebook chính, [`btc-sjc-vnindex-volatility.ipynb`](./btc-sjc-vnindex-volatility.ipynb), gồm ba phần:
 
 1. **ARMA–EGARCH:** ước lượng lợi suất và biến động có điều kiện của từng tài sản.
 2. **DCC–GARCH:** phân tích tương quan động giữa các cặp tài sản.
