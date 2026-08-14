@@ -16,6 +16,16 @@ Phân tích cũng sử dụng các kiểm định ADF, Phillips–Perron, KPSS, 
 - `3y-gold-returns.csv`: giá và lợi suất vàng SJC.
 - `3y-vnindex-returns.csv`: chỉ số và lợi suất VN-Index.
 
+### Quy trình tạo dữ liệu
+
+Ba file dữ liệu lợi suất trong repository này được tạo bằng quy trình xử lý tại:
+
+- [goldvn-data-pipeline](https://github.com/htrang22/goldvn-data-pipeline)
+
+Pipeline thực hiện tải dữ liệu thị trường, đọc file giá vàng do người dùng
+tự cung cấp, làm sạch dữ liệu và tính lợi suất. Repository pipeline không
+lưu trữ hoặc phân phối dữ liệu giá vàng thô.
+
 ## Cách chạy
 
 Notebook đã được kiểm tra với **Python 3.14.5**. Mở notebook bằng Jupyter Notebook hoặc Google Colab, đặt ba file CSV cùng thư mục và chạy lần lượt các cell từ trên xuống. Cell đầu notebook sẽ cài đúng phiên bản các thư viện Python cần thiết. Ngoài ra, có thể chuẩn bị môi trường trước bằng lệnh `pip install -r requirements.txt`.
