@@ -2,13 +2,53 @@
 
 Dự án phân tích lợi suất và biến động của ba tài sản tại Việt Nam: **Bitcoin (quy đổi VND), vàng SJC và VN-Index**.
 
-Notebook chính, [`btc-sjc-vnindex-volatility.ipynb`](./btc-sjc-vnindex-volatility.ipynb), gồm ba phần:
+Phân tích được tổ chức theo hai nhánh phương pháp bổ sung cho nhau:
 
-1. **ARMA–EGARCH:** ước lượng lợi suất và biến động có điều kiện của từng tài sản.
-2. **DCC–GARCH:** phân tích tương quan động giữa các cặp tài sản.
-3. **Diebold–Yılmaz:** đo lường mức độ và hướng lan truyền rủi ro bằng VAR và GFEVD.
+1. [`btc-sjc-vnindex-volatility.ipynb`](./btc-sjc-vnindex-volatility.ipynb) là
+   phân tích nền, gồm **ARMA–EGARCH**, **DCC–GARCH** và mô hình
+   **VAR hệ số cố định + GFEVD/Diebold–Yılmaz**.
+2. [`tvp-var-connectedness.ipynb`](./tvp-var-connectedness.ipynb) là phần mở
+   rộng, dùng **TVP–VAR + GFEVD thay đổi theo thời gian** để theo dõi diễn biến
+   của TCI và vai trò truyền/nhận rủi ro. Phần này bổ sung cho mô hình VAR tĩnh,
+   không thay thế kết quả nền.
 
 Phân tích cũng sử dụng các kiểm định ADF, Phillips–Perron, KPSS, Zivot–Andrews, Ljung–Box và ARCH-LM; đồng thời kiểm tra độ vững theo nhiều kỳ dự báo.
+
+## Cấu trúc dự án
+
+```text
+btc-sjc-vnindex-risk-analysis/
+├── 3y-bitcoin-vnd-returns.csv
+├── 3y-gold-returns.csv
+├── 3y-vnindex-returns.csv
+├── btc-sjc-vnindex-volatility.ipynb   # Mô hình 1, 2 và VAR-DY tĩnh
+├── tvp-var-connectedness.ipynb        # Mở rộng TVP-VAR connectedness
+├── outputs/
+│   └── model2_conditional_volatility.csv  # Đầu vào chung cho Model 3
+├── DATA_PROVENANCE.md
+├── requirements.txt
+└── README.md
+```
+
+## Quy trình phương pháp
+
+```text
+Giá tài sản
+    ↓
+Lợi suất
+    ↓
+ARMA–EGARCH → conditional volatility của BTC, SJC và VN-Index
+    ↓
+    ├── DCC–GARCH → tương quan động
+    │
+    └── Connectedness
+        ├── Static VAR → GFEVD → DY (TCI, FROM, TO, NET toàn mẫu)
+        └── TVP–VAR   → TVP-GFEVD → TCI_t và NET_t theo thời gian
+```
+
+Nhánh static VAR–DY trả lời câu hỏi về cấu trúc lan truyền trung bình trong toàn
+mẫu. Nhánh TVP–VAR kiểm tra cấu trúc đó thay đổi khi nào và với cường độ ra sao;
+do đó hai đặc tả nên được đọc như baseline và extension/alternative specification.
 
 ## Dữ liệu
 
@@ -28,7 +68,13 @@ lưu trữ hoặc phân phối dữ liệu giá vàng thô.
 
 ## Cách chạy
 
-Notebook đã được kiểm tra với **Python 3.14.5**. Mở notebook bằng Jupyter Notebook hoặc Google Colab, đặt ba file CSV cùng thư mục và chạy lần lượt các cell từ trên xuống. Cell đầu notebook sẽ cài đúng phiên bản các thư viện Python cần thiết. Ngoài ra, có thể chuẩn bị môi trường trước bằng lệnh `pip install -r requirements.txt`.
+Các notebook đã được kiểm tra với **Python 3.14.5**. Mở bằng Jupyter Notebook
+hoặc Google Colab và chạy các cell từ trên xuống. Chạy
+`btc-sjc-vnindex-volatility.ipynb` trước để tái tạo
+`outputs/model2_conditional_volatility.csv`, sau đó chạy
+`tvp-var-connectedness.ipynb` nếu muốn thực hiện phần mở rộng TVP–VAR. Cell đầu
+notebook cài đúng phiên bản các thư viện cần thiết; cũng có thể chuẩn bị môi
+trường trước bằng `pip install -r requirements.txt`.
 
 ## Ý nghĩa kinh tế thực tiễn
 
