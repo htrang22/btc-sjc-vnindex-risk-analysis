@@ -46,9 +46,7 @@ ARMA–EGARCH → conditional volatility của BTC, SJC và VN-Index
         └── TVP–VAR   → TVP-GFEVD → TCI_t và NET_t theo thời gian
 ```
 
-Nhánh static VAR–DY trả lời câu hỏi về cấu trúc lan truyền trung bình trong toàn
-mẫu. Nhánh TVP–VAR kiểm tra cấu trúc đó thay đổi khi nào và với cường độ ra sao;
-do đó hai đặc tả nên được đọc như baseline và extension/alternative specification.
+Nhánh static VAR–DY trả lời câu hỏi về cấu trúc lan truyền trung bình trong toàn mẫu. Nhánh TVP–VAR kiểm tra cấu trúc đó thay đổi khi nào và với cường độ ra sao; do đó hai đặc tả nên được đọc như baseline và extension/alternative specification.
 
 ## Dữ liệu
 
