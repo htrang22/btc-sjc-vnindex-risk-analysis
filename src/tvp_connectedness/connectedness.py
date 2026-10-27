@@ -53,3 +53,31 @@ def calculate_connectedness(
         net=pd.DataFrame(net, index=dates, columns=variables),
         theta=theta,
     )
+
+
+def net_pairwise(result: ConnectednessResult) -> pd.DataFrame:
+    """Net pairwise directional connectedness i -> j = theta[j, i] - theta[i, j] (%).
+
+    Positive values mean i transmits more to j than it receives from j.
+    """
+    variables = list(result.net.columns)
+    columns = {}
+    for first, i in enumerate(variables):
+        for second in range(first + 1, len(variables)):
+            j = variables[second]
+            columns[f"{i}->{j}"] = (
+                result.theta[:, second, first] - result.theta[:, first, second]
+            ) * 100
+    return pd.DataFrame(columns, index=result.net.index)
+
+
+def gfevd_long(result: ConnectednessResult) -> pd.DataFrame:
+    """Time-varying normalized GFEVD (%) in long format: Date, receiver, shock."""
+    variables = list(result.net.columns)
+    n_obs, n_vars, _ = result.theta.shape
+    index = pd.MultiIndex.from_product(
+        [result.net.index, variables, variables], names=["Date", "receiver", "shock"]
+    )
+    return pd.DataFrame(
+        {"share": result.theta.reshape(n_obs * n_vars * n_vars) * 100}, index=index
+    )

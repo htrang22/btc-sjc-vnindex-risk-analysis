@@ -1,0 +1,25 @@
+Test,Asset,Case,Statistic,p-value,Lag,Conclusion
+ADF,BTC,"No constant, no trend",-34.9132200113604,0.0,0,Stationary
+ADF,BTC,Constant,-34.935805474982786,0.0,0,Stationary
+ADF,BTC,Constant + trend,-35.07641177924824,0.0,0,Stationary
+PP,BTC,"No constant, no trend",-34.868485974743635,0.0,22,Stationary
+PP,BTC,Constant,-34.88474526117788,0.0,22,Stationary
+PP,BTC,Constant + trend,-35.046040450160234,0.0,22,Stationary
+KPSS,BTC,Constant,0.5475072396358482,0.030966837919853996,2,Non-stationary
+KPSS,BTC,Constant + trend,0.03937552313286217,0.1,3,Stationary
+ADF,SJC,"No constant, no trend",-27.111083540367233,0.0,0,Stationary
+ADF,SJC,Constant,-27.238442499703584,0.0,0,Stationary
+ADF,SJC,Constant + trend,-27.23796670109685,0.0,0,Stationary
+PP,SJC,"No constant, no trend",-27.36104099472009,0.0,21,Stationary
+PP,SJC,Constant,-27.317833334629412,0.0,21,Stationary
+PP,SJC,Constant + trend,-27.305137160838697,0.0,21,Stationary
+KPSS,SJC,Constant,0.204028470921706,0.1,3,Stationary
+KPSS,SJC,Constant + trend,0.19074749719162754,0.019469688553139672,3,Non-stationary
+ADF,VNINDEX,"No constant, no trend",-9.75187919171985,3.5266841557806524e-17,7,Stationary
+ADF,VNINDEX,Constant,-9.807189114843405,5.784048006584441e-17,7,Stationary
+ADF,VNINDEX,Constant + trend,-9.814079676456233,5.756197473366275e-15,7,Stationary
+PP,VNINDEX,"No constant, no trend",-24.66065158414127,0.0,20,Stationary
+PP,VNINDEX,Constant,-24.679677582992955,0.0,20,Stationary
+PP,VNINDEX,Constant + trend,-24.668944330937403,0.0,20,Stationary
+KPSS,VNINDEX,Constant,0.09099576399089299,0.1,8,Stationary
+KPSS,VNINDEX,Constant + trend,0.062967577512693,0.1,8,Stationary
