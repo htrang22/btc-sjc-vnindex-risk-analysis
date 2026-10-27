@@ -1,2 +1,0 @@
-Asset,Case,Statistic,p-value,Lag,Break date,CV 1%,CV 5%,CV 10%,Conclusion
-SJC,Constant + trend,-6.113863686471303,0.0018853586957929475,5,2024-06-04,-5.57556,-5.07332,-4.82668,Stationary
