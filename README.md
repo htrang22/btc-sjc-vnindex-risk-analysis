@@ -164,13 +164,13 @@ Script chỉ in và lưu kết quả. Phần diễn giải chi tiết từng ki�
 
 | Notebook | Phần | Nội dung |
 |---|---|---|
-| [`btc-sjc-vnindex-volatility.ipynb`](./btc-sjc-vnindex-volatility.ipynb) | MODEL 1 | Bước 1A: tính dừng, chọn ARMA, ARCH-LM, chọn EGARCH, phương trình ước lượng và chẩn đoán |
+| [`Notebook-3assets-Volatility.ipynb`](./Notebook-3assets-Volatility.ipynb) | MODEL 1 | Bước 1A: tính dừng, chọn ARMA, ARCH-LM, chọn EGARCH, phương trình ước lượng và chẩn đoán |
 | | MODEL 2 | Bước 1B (mẫu đồng bộ) và Bước 2: kiểm tra phần dư SJC, DCC từng cặp, Engle–Sheppard, giai đoạn tương quan |
 | | MODEL 3 | VAR(9)–Diebold–Yılmaz tĩnh, giữ lại để tham chiếu và so sánh với TVP-VAR |
-| [`tvp-var-connectedness.ipynb`](./tvp-var-connectedness.ipynb) | Mục 1–6 | Bước 3: tính dừng của σₜ, chọn độ trễ, TVP-VAR(1), độ ổn định, TVP-GFEVD, connectedness theo thời gian |
+| [`Notebook-tvp-var-connectedness.ipynb`](./Notebook-tvp-var-connectedness.ipynb) | Mục 1–6 | Bước 3: tính dừng của σₜ, chọn độ trễ, TVP-VAR(1), độ ổn định, TVP-GFEVD, connectedness theo thời gian |
 | | Mục 7 | Độ vững với 6 đặc tả, các giai đoạn bất ổn cục bộ, so sánh DY-VAR(9) tĩnh với TVP-VAR(1) |
 
-Mở notebook bằng Jupyter hoặc Google Colab, đặt thư mục gốc repository làm working directory, rồi chạy các cell từ trên xuống. `btc-sjc-vnindex-volatility.ipynb` cũng ghi ra `outputs/model2_conditional_volatility.csv` (giống hệt file do Bước 1 tạo).
+Mở notebook bằng Jupyter hoặc Google Colab, đặt thư mục gốc repository làm working directory, rồi chạy các cell từ trên xuống. `Notebook-3assets-Volatility.ipynb` cũng ghi ra `outputs/model2_conditional_volatility.csv` (giống hệt file do Bước 1 tạo).
 
 ## 6. Tóm tắt kết quả
 
