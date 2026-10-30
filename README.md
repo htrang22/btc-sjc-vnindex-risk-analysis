@@ -44,8 +44,8 @@ btc-sjc-vnindex-risk-analysis/
 │       ├── diagnostics.py            #   bán kính phổ, giai đoạn bất ổn cục bộ
 │       ├── lag_selection.py, pipeline.py, io.py, plots.py
 │
-├── btc-sjc-vnindex-volatility.ipynb  # Notebook Bước 1–2: output và nhận xét chi tiết
-├── tvp-var-connectedness.ipynb       # Notebook Bước 3: output và nhận xét chi tiết
+├── Notebook-3assets-Volatility.ipynb          # Notebook Bước 1–2: output và nhận xét chi tiết
+├── Notebook-tvp-var-connectedness.ipynb       # Notebook Bước 3: output và nhận xét chi tiết
 │
 ├── outputs/                          # Bảng kết quả (CSV)
 │   ├── model2_conditional_volatility.csv   # σₜ đồng bộ, đầu vào của Bước 3
