@@ -10,7 +10,7 @@ Ba bộ dữ liệu trong repository được chuẩn bị để phân tích l�
 - vàng miếng SJC tại TPHCM;
 - VN-Index.
 
-Các bộ dữ liệu này được sử dụng trong notebook `btc-sjc-vnindex-volatility.ipynb` để thực hiện các phân tích ARMA–EGARCH, DCC–GARCH và Diebold–Yılmaz.
+Các bộ dữ liệu này được sử dụng trong notebook `Notebook-3assets-Volatility.ipynb` để thực hiện các phân tích ARMA–EGARCH, DCC–GARCH và Diebold–Yılmaz.
 
 ## 2. Quy trình xử lý dữ liệu
 
