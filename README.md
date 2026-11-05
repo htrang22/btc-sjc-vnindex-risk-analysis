@@ -2,6 +2,8 @@
 
 Dự án phân tích rủi ro của ba tài sản tại Việt Nam: **Bitcoin (quy đổi VND), vàng miếng SJC và VN-Index**, giai đoạn 08/2023–08/2026. Phân tích gồm ba bước nối tiếp nhau. Đầu ra của bước trước là đầu vào của bước sau:
 
+> Repository này được tạo lại với lịch sử mới để gỡ dữ liệu của bên thứ ba. Xem [lịch sử dự án](#10-lịch-sử-dự-án) và [các quyết định phân tích](#9-các-quyết-định-phân-tích).
+
 ```text
 Giá tài sản → Lợi suất
     ↓
@@ -320,3 +322,29 @@ Các kết luận phản ánh mẫu dữ liệu và đặc tả mô hình của 
 - **Không phải quan hệ nhân quả:** "truyền" và "nhận" là khái niệm trong khuôn khổ phân rã phương sai sai số dự báo, không xác định cơ chế nhân quả kinh tế.
 - **Thiếu biến vĩ mô:** chưa đưa lãi suất, lạm phát, tỷ giá, giá vàng thế giới hay chỉ số quốc tế vào mô hình, nên chưa giải thích được nguyên nhân kinh tế của các thay đổi.
 - **Phương pháp không mới:** ARMA–EGARCH, DCC và connectedness đều là phương pháp phổ biến. Đóng góp chính của dự án là áp dụng và đối chiếu chúng cho ba thị trường trong bối cảnh Việt Nam.
+
+## 9. Các quyết định phân tích
+
+Những lựa chọn dưới đây ảnh hưởng trực tiếp đến kết luận, có thể tìm thấy quá trình phân tích đưa ra quyết định đầy đủ trong hai notebook.
+
+| Quyết định | Lý do | Đánh đổi |
+|---|---|---|
+| **Dùng EGARCH(1,1,2)-t cho Bitcoin thay vì mô hình có AIC thấp nhất** | EGARCH(2,1,1) có AIC thấp hơn một chút (4.892,37 so với 4.893,24), nhưng hệ số α₂ không có ý nghĩa thống kê (p = 0,105). Ở EGARCH(1,1,2), α và cả hai hệ số β đều có ý nghĩa. | Chấp nhận AIC cao hơn khoảng 0,9 điểm để có mô hình dễ diễn giải hơn. |
+| **Ước lượng lại trên mẫu đồng bộ cho Bước 2–3** | Mô hình đa biến cần ba chuỗi cùng ngày, nên lợi suất được tính lại trên 747 ngày chung và ARMA được chọn lại (BTC đổi từ ARMA(0,0) sang ARMA(1,0), SJC từ ARMA(0,1) sang ARMA(0,0)). | Mất các quan sát Bitcoin cuối tuần và ngày nghỉ. |
+| **Giữ nguyên phần dư chuẩn hóa của SJC dù phương sai chỉ 0,503** | Đã loại trừ lỗi tính toán. Đổi bậc EGARCH không cải thiện (0,499–0,520). Phân phối Normal đưa phương sai về gần 1 nhưng AIC kém Student-t gần 294 điểm. | Giả định phương sai đơn vị không được thỏa mãn hoàn toàn, nên không chuẩn hóa lại sau ước lượng. |
+| **Kết luận chính nghiêng về CCC dù ước lượng được DCC** | Hai cặp có BTC có a tiến về 0. Với SJC–VN-Index có nghiệm nội, nhưng Engle–Sheppard không bác bỏ tương quan hằng ở mọi độ trễ. | Đường DCC chỉ được dùng để mô tả, không xem là bằng chứng về tương quan động. |
+| **Giữ chuỗi biến động ở dạng mức** | ADF và PP bác bỏ nghiệm đơn vị. KPSS mức của SJC mâu thuẫn, nhưng KPSS có xu hướng và Zivot–Andrews (điểm gãy 04/06/2024) cho thấy nhiều khả năng do thay đổi cấu trúc. | Điểm gãy chưa được đưa trực tiếp vào mô hình. |
+| **Chuyển từ VAR tĩnh sang TVP-VAR(1)** | VAR(9) chỉ cho một cấu trúc trung bình, với VN-Index là bên truyền ròng duy nhất. TVP-VAR cho thấy vai trò truyền và nhận thay đổi theo thời gian. | Độ trễ 1 chọn theo BIC/HQIC đơn giản hơn nhiều so với độ trễ 9 mà VAR tĩnh cần để hết tự tương quan phần dư. Có 14 ngày bất ổn cục bộ. |
+| **Đánh giá độ vững theo dấu của NET** | Mức TCI phụ thuộc horizon và κ, nên tiêu chí là vai trò truyền và nhận có giữ nguyên qua 6 đặc tả hay không. | Kết luận vững về chiều trung bình, không phải về mức TCI tuyệt đối. |
+
+## 10. Lịch sử dự án
+
+Dự án được phát triển từ 08/2026 đến 10/2026 (27 commit), khởi đầu là tiểu luận môn Kinh tế lượng:
+
+1. **08/2026:** phân tích nền trong notebook gồm ARMA–EGARCH, CCC/DCC–GARCH và VAR(9)–Diebold–Yılmaz tĩnh.
+2. **09/2026:** mở rộng sang TVP-VAR để theo dõi lan tỏa theo thời gian.
+3. **10/2026:** đóng gói thành pipeline Python 3 bước.
+
+Repository public này được tạo lại vào 11/2026 với một commit duy nhất, để gỡ dữ liệu giá của bên thứ ba khỏi toàn bộ lịch sử git. Bản đầy đủ được lưu trong repository private.
+
+Đặc tả mô hình, kiểm định và nhận xét kết quả được thực hiện trong khuôn khổ tiểu luận. Việc đóng gói notebook thành script và soạn README có dùng AI hỗ trợ.
