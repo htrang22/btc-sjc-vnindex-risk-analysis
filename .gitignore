@@ -1,0 +1,11 @@
+.tools/
+.DS_Store
+.ipynb_checkpoints/
+__pycache__/
+
+# Daily series that allow the input returns to be rebuilt; Step 1 regenerates them
+outputs/step1_arma_egarch/synchronized_returns.csv
+outputs/step1_arma_egarch/synchronized_std_residuals.csv
+
+# Input data is not redistributed; see DATA_PROVENANCE.md
+3y-*.csv

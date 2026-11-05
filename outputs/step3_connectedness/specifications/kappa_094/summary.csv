@@ -1,0 +1,15 @@
+,value
+lambda_beta,0.999
+kappa_sigma,0.94
+horizon,10.0
+stable_share,0.9745649263721553
+unstable_periods,19.0
+max_spectral_radius,1.026333403014276
+mean_tci,9.455522923933328
+final_tci,1.6385299570876974
+mean_net_BTC,3.4442017746554177
+mean_net_SJC,3.177985769366078
+mean_net_VNINDEX,-6.622187544021489
+final_net_BTC,-1.5482304836685445
+final_net_SJC,1.1285489536505544
+final_net_VNINDEX,0.41968153001796793
