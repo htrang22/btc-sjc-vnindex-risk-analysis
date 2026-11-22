@@ -43,9 +43,32 @@ TVP_SPECIFICATIONS = (
 )
 TVP_BASELINE = "baseline_0999"
 
+# Step 4: walk-forward volatility forecasts and 1-day VaR/ES backtests.
+# Own-calendar returns with the Model 1 specifications; expanding window.
+FORECAST_INITIAL_WINDOW = 500      # first estimation window (observations)
+FORECAST_REFIT_EVERY = 20          # re-estimate parameters every 20 observations
+FORECAST_HORIZONS = (1, 5)
+FORECAST_SIMULATIONS = 2000        # bootstrap paths for EGARCH multi-step forecasts
+FORECAST_SEED = 20260801
+EWMA_LAMBDA = 0.94                 # RiskMetrics daily decay
+ROLLING_WINDOW = 60                # rolling-variance benchmark (about 3 months)
+VAR_LEVELS = (0.05, 0.01)          # tail probabilities: 95% and 99% VaR/ES
+ES_BACKTEST_SIMULATIONS = 5000
+
+# Step 4C: true holdout. Returns after the original sample end, built with the
+# same pipeline (see DATA_PROVENANCE.md). Optional and not redistributed; the
+# file overlaps the original sample, only dates after ORIGINAL_SAMPLE_END are used.
+ORIGINAL_SAMPLE_END = "2026-08-01"
+HOLDOUT_FILES = {
+    "BTC": "holdout-bitcoin-vnd-returns.csv",
+    "SJC": "holdout-gold-returns.csv",
+    "VNINDEX": "holdout-vnindex-returns.csv",
+}
+
 # Files shared between steps
 STEP1_DIR = "step1_arma_egarch"
 STEP2_DIR = "step2_dcc_garch"
 STEP3_DIR = "step3_connectedness"
+STEP4_DIR = "step4_forecast_var"
 SYNC_STD_RESID_FILE = OUTPUTS / STEP1_DIR / "synchronized_std_residuals.csv"
 CONDITIONAL_VOLATILITY_FILE = OUTPUTS / "model2_conditional_volatility.csv"

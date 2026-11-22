@@ -9,3 +9,6 @@ outputs/step1_arma_egarch/synchronized_std_residuals.csv
 
 # Input data is not redistributed; see DATA_PROVENANCE.md
 3y-*.csv
+
+# Holdout data after the original sample (Step 4C); not redistributed either
+holdout-*.csv

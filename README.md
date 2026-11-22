@@ -1,6 +1,6 @@
 # Econometrics: Biến động, tương quan và lan tỏa rủi ro giữa Bitcoin, vàng SJC và VN-Index
 
-Dự án phân tích rủi ro của ba tài sản tại Việt Nam: **Bitcoin (quy đổi VND), vàng miếng SJC và VN-Index**, giai đoạn 08/2023–08/2026. Phân tích gồm ba bước nối tiếp nhau. Đầu ra của bước trước là đầu vào của bước sau:
+Dự án phân tích rủi ro của ba tài sản tại Việt Nam: **Bitcoin (quy đổi VND), vàng miếng SJC và VN-Index**, giai đoạn 08/2023–08/2026. Phân tích gồm ba bước mô tả nối tiếp nhau, đầu ra của bước trước là đầu vào của bước sau. Bước 4 kiểm chứng khả năng dự báo của mô hình biến động ở Bước 1:
 
 > Repository này được tạo lại với lịch sử mới để gỡ dữ liệu của bên thứ ba. Xem [lịch sử dự án](#10-lịch-sử-dự-án) và [các quyết định phân tích](#9-các-quyết-định-phân-tích).
 
@@ -13,6 +13,9 @@ Bước 1. ARMA–EGARCH ──► biến động có điều kiện σₜ  +  p
     │                          │          Bước 2. CCC/DCC–GARCH → tương quan có điều kiện
     │                          ▼
     └────────────► Bước 3. TVP-VAR(1) → TVP-GFEVD → TCIₜ, FROMₜ, TOₜ, NETₜ, net theo cặp
+
+Bước 1 (đặc tả Model 1) ──► Bước 4. Dự báo σ walk-forward → so sánh benchmark → VaR/ES 1 ngày → backtest
+                                        └─► kiểm định lại trên dữ liệu mới 08–11/2026 (holdout)
 ```
 
 ## 1. Cấu trúc dự án
@@ -22,18 +25,21 @@ btc-sjc-vnindex-risk-analysis/
 ├── DATA_PROVENANCE.md                # Nguồn gốc và quy trình làm sạch dữ liệu
 ├── requirements.txt
 │
-├── run_all.py                        # Chạy cả 3 bước theo thứ tự
+├── run_all.py                        # Chạy cả 4 bước theo thứ tự
 ├── step1_arma_egarch.py              # Bước 1: ARMA–EGARCH
 ├── step2_dcc_garch.py                # Bước 2: CCC/DCC–GARCH
 ├── step3_connectedness.py            # Bước 3: TVP-VAR connectedness
+├── step4_forecast_var.py             # Bước 4: dự báo biến động, VaR/ES và backtest
 │
 ├── src/
-│   ├── risk_analysis/                # Code dùng chung cho Bước 1–2
+│   ├── risk_analysis/                # Code dùng chung cho Bước 1–2 và 4
 │   │   ├── config.py                 #   đường dẫn, đặc tả mô hình đã chọn, tham số
 │   │   ├── data.py                   #   đọc dữ liệu, đồng bộ lịch, thống kê mô tả
 │   │   ├── stationarity.py           #   ADF, PP, KPSS, Zivot–Andrews
 │   │   ├── arma_egarch.py            #   tìm ARMA/EGARCH, ước lượng, kiểm định phần dư
 │   │   ├── dcc.py                    #   DCC(1,1) multi-start, CCC, Engle–Sheppard
+│   │   ├── forecasting.py            #   dự báo walk-forward, benchmark, VaR/ES Student-t và FHS
+│   │   ├── backtesting.py            #   QLIKE/MSE, Mincer–Zarnowitz, Diebold–Mariano, backtest VaR/ES
 │   │   ├── plotting.py
 │   │   └── reporting.py
 │   └── tvp_connectedness/            # Code cho Bước 3
@@ -51,11 +57,13 @@ btc-sjc-vnindex-risk-analysis/
 │   ├── model2_conditional_volatility.csv   # σₜ đồng bộ, đầu vào của Bước 3
 │   ├── step1_arma_egarch/
 │   ├── step2_dcc_garch/
-│   └── step3_connectedness/
+│   ├── step3_connectedness/
+│   └── step4_forecast_var/
 └── figures/                          # Hình, mỗi bước một thư mục riêng
     ├── step1_arma_egarch/
     ├── step2_dcc_garch/
-    └── step3_connectedness/
+    ├── step3_connectedness/
+    └── step4_forecast_var/
 ```
 
 ## 2. Mục tiêu: ba câu hỏi, ba mô hình
@@ -89,6 +97,8 @@ Repository **không kèm dữ liệu đầu vào**, vì dữ liệu lấy từ b
 1. Chạy pipeline [goldvn-data-pipeline](https://github.com/htrang22/goldvn-data-pipeline). Giá vàng phải do người dùng tự chuẩn bị, vì pipeline không phân phối dữ liệu này.
 2. Đổi tên ba file trong `data/final/` thành tên ở bảng trên (thêm tiền tố `3y-`) và đặt ở thư mục gốc repository.
 3. Giữ dòng đầu tiên của mỗi file dù chưa có lợi suất, vì đó là ngày gốc để tính lợi suất đồng bộ.
+
+**Dữ liệu holdout cho Bước 4C** (tùy chọn): ba file `holdout-*.csv` cùng cấu trúc, tạo bằng cùng pipeline cho khoảng 20/07–21/11/2026, đặt ở thư mục gốc. Chỉ các ngày sau 01/08/2026 được dùng. Đoạn chồng lấn 20/07–01/08 dùng để kiểm tra dữ liệu mới khớp với dữ liệu cũ. Không có các file này thì Bước 4 bỏ qua phần C.
 
 Dữ liệu tải lại ở thời điểm khác có thể làm kết quả thay đổi. Chi tiết nguồn, quy tắc làm sạch và mã SHA-256 để đối chiếu xem [DATA_PROVENANCE.md](./DATA_PROVENANCE.md).
 
@@ -138,21 +148,52 @@ Bước này chạy trên hai mẫu:
 5. **Chẩn đoán:** bán kính phổ của ma trận hệ số tại từng thời điểm, để phát hiện các giai đoạn bất ổn cục bộ.
 6. **Độ vững:** 6 đặc tả với $\lambda_\beta \in \{0{,}999;\ 0{,}997\}$, $\kappa_\Sigma \in \{0{,}94;\ 0{,}96;\ 0{,}98\}$, $H \in \{5;\ 10;\ 20\}$.
 
+### Bước 4 – Dự báo biến động và backtest VaR/ES (`step4_forecast_var.py`)
+
+Bước 1–3 ước lượng trên toàn mẫu nên chỉ mô tả dữ liệu đã có. Bước 4 kiểm tra mô hình ARMA–EGARCH-t của Model 1 có **dự báo** được biến động và rủi ro đuôi ngoài mẫu hay không.
+
+1. **Walk-forward, cửa sổ mở rộng:** lợi suất theo lịch riêng của từng tài sản. Cửa sổ ước lượng đầu tiên gồm 500 quan sát, sau đó cứ 20 quan sát lại ước lượng lại toàn bộ tham số trên mọi dữ liệu đã có. Giữa hai lần ước lượng, tham số giữ nguyên còn bộ lọc được cập nhật mỗi ngày. Mọi dự báo cho ngày $t$ chỉ dùng thông tin đến ngày $t-1$.
+
+   | Tài sản | Ngoài mẫu | Số ngày | Số lần ước lượng lại |
+   |---|---|---:|---:|
+   | Bitcoin | 14/12/2024 – 01/08/2026 | 596 | 30 |
+   | Vàng SJC | 31/03/2025 – 01/08/2026 | 409 | 21 |
+   | VN-Index | 05/08/2025 – 31/07/2026 | 247 | 13 |
+
+2. **Benchmark:** mọi mô hình biến động được ước lượng trên cùng phần dư ARMA, để phép so sánh chỉ khác ở phương trình phương sai. Các mô hình gồm EGARCH-t (đặc tả Model 1), GARCH(1,1)-t, GJR-GARCH(1,1,1)-t, EWMA (RiskMetrics, λ = 0,94) và phương sai trượt 60 ngày.
+3. **Horizon 1 ngày và 5 ngày:** dự báo 5 ngày là tổng phương sai của 5 ngày tới. GARCH và GJR có công thức đóng. EWMA và phương sai trượt là hằng số theo horizon. EGARCH với sai số Student-t không có phương sai nhiều bước hữu hạn, vì $E[e^{\alpha|z|}]$ không tồn tại khi $z$ có phân phối t. Vì vậy dự báo 5 ngày của EGARCH được bootstrap từ phần dư chuẩn hóa trong mẫu của từng cửa sổ.
+4. **Đánh giá dự báo:** dữ liệu ngày không có realized variance trong ngày, nên dùng bình phương phần dư ARMA làm proxy (tổng 5 ngày cho horizon 5).
+   - Hàm tổn thất **QLIKE** và **MSE** trên phương sai: hai hàm này xếp hạng mô hình đúng như khi dùng phương sai thật, dù proxy nhiễu (Patton, 2011). **MAE** trên độ lệch chuẩn không có tính chất này, chỉ dùng để tham khảo.
+   - **Hồi quy Mincer–Zarnowitz** proxy $= a + b \cdot$ dự báo, kiểm định Wald $a = 0, b = 1$ với sai số chuẩn HAC.
+   - **Diebold–Mariano** so EGARCH-t với từng benchmark trên QLIKE và MSE, có hiệu chỉnh mẫu nhỏ Harvey–Leybourne–Newbold.
+5. **VaR và ES 1 ngày** ở mức 95% và 99% từ dự báo trung bình ARMA và σ của EGARCH-t, theo hai cách:
+   - **Student-t tham số:** phân vị và ES của phân phối t chuẩn hóa phương sai đơn vị, với ν ước lượng trong cửa sổ.
+   - **Filtered historical simulation (FHS):** phân vị và trung bình đuôi thực nghiệm của phần dư chuẩn hóa trong mẫu, nhân với σ dự báo.
+6. **Backtest VaR:** Kupiec (tần suất vi phạm), Christoffersen (vi phạm độc lập và kiểm định có điều kiện), Basel traffic light cho VaR 99% (toàn bộ giai đoạn ngoài mẫu và 250 ngày cuối).
+7. **Backtest ES:** McNeil–Frey (phần dư vượt ngưỡng $(L_t - ES_t)/\sigma_t$ có trung bình 0, bootstrap một phía) và Acerbi–Szekely $Z_2$ (p-value mô phỏng 5.000 lần từ chính phân phối dự báo).
+8. **Kiểm định trên dữ liệu mới (Bước 4C):** dữ liệu sau 01/08/2026 không tham gia vào bất kỳ lựa chọn nào: bậc mô hình, benchmark, cửa sổ, tần suất ước lượng lại và các ngưỡng đều được cố định trước. Walk-forward chạy tiếp vào phần dữ liệu mới theo đúng quy trình, rồi các bước 4–7 được đánh giá lại chỉ trên các ngày mới.
+
+   | Tài sản | Holdout | Số ngày |
+   |---|---|---:|
+   | Bitcoin | 02/08/2026 – 21/11/2026 | 112 |
+   | Vàng SJC | 03/08/2026 – 21/11/2026 | 94 |
+   | VN-Index | 03/08/2026 – 20/11/2026 | 77 |
+
 ## 5. Cách chạy
 
 ### Chạy script Python
 
-Bảng kết quả và hình của cả 3 bước đã có sẵn trong `outputs/` và `figures/`. Không có dữ liệu đầu vào thì chỉ chạy lại được **Bước 3**, từ `outputs/model2_conditional_volatility.csv`:
+Bảng kết quả và hình của cả 4 bước đã có sẵn trong `outputs/` và `figures/`. Không có dữ liệu đầu vào thì chỉ chạy lại được **Bước 3**, từ `outputs/model2_conditional_volatility.csv`:
 
 ```bash
 pip install -r requirements.txt
 python3 step3_connectedness.py
 ```
 
-Sau khi tạo lại dữ liệu theo mục 3, có thể chạy cả 3 bước:
+Sau khi tạo lại dữ liệu theo mục 3, có thể chạy cả 4 bước:
 
 ```bash
-python3 run_all.py            # chạy cả 3 bước, khoảng 1 phút
+python3 run_all.py            # chạy cả 4 bước, khoảng 2 phút
 python3 run_all.py --quick    # bỏ qua bước tìm mô hình ứng viên ở Bước 1, khoảng 10 giây
 ```
 
@@ -162,6 +203,7 @@ Có thể chạy riêng từng bước, nhưng phải theo đúng thứ tự vì
 python3 step1_arma_egarch.py
 python3 step2_dcc_garch.py
 python3 step3_connectedness.py
+python3 step4_forecast_var.py    # chỉ cần 3 file CSV lợi suất, không phụ thuộc Bước 2–3
 ```
 
 Chạy các lệnh từ thư mục gốc của repository. Code đã được kiểm tra với Python 3.14.
@@ -171,6 +213,7 @@ Chạy các lệnh từ thư mục gốc của repository. Code đã được ki
 | 1 | 3 file CSV lợi suất (tự tạo, xem mục 3) | `outputs/step1_arma_egarch/`, `outputs/model2_conditional_volatility.csv` | `figures/step1_arma_egarch/` |
 | 2 | `outputs/step1_arma_egarch/synchronized_std_residuals.csv` (do Bước 1 tạo khi chạy, không lưu trong repo) | `outputs/step2_dcc_garch/` | `figures/step2_dcc_garch/` |
 | 3 | `outputs/model2_conditional_volatility.csv` | `outputs/step3_connectedness/` | `figures/step3_connectedness/` |
+| 4 | 3 file CSV lợi suất; thêm 3 file `holdout-*.csv` cho phần C (xem mục 3) | `outputs/step4_forecast_var/`, phần C trong `holdout/` | `figures/step4_forecast_var/`, phần C trong `holdout/` |
 
 Bậc mô hình cuối cùng được cố định trong [`src/risk_analysis/config.py`](./src/risk_analysis/config.py). Lý do: lựa chọn kết hợp AIC, BIC, kiểm định phần dư và nguyên tắc mô hình gọn, nên không phải lúc nào cũng trùng với ứng viên đứng đầu một tiêu chí. Bảng ứng viên vẫn được lưu ra file `*_candidates.csv` để đối chiếu.
 
@@ -190,7 +233,7 @@ Hai notebook nằm trong thư mục [`notebooks/`](./notebooks) và đã có s�
 
 ## 6. Tóm tắt kết quả
 
-Phần này tóm tắt nhận xét sau output trong hai notebook. Nhận xét đầy đủ kèm bảng và hình xem trong notebook (mục 5).
+Phần này tóm tắt nhận xét sau output trong hai notebook. Nhận xét đầy đủ kèm bảng và hình xem trong notebook (mục 5). Bước 4 chưa có notebook, kết quả lấy trực tiếp từ các bảng trong `outputs/step4_forecast_var/`.
 
 ### Mô hình 1 – ARMA–EGARCH: đặc điểm biến động
 
@@ -295,6 +338,82 @@ Phần này tóm tắt nhận xét sau output trong hai notebook. Nhận xét đ
 ![TCI theo thời gian](figures/step3_connectedness/tci.png)
 ![NET theo thời gian](figures/step3_connectedness/net_all.png)
 
+### Mô hình 4 – Dự báo biến động và backtest VaR/ES
+
+**Độ chính xác dự báo** (QLIKE trung bình, càng thấp càng tốt; **đậm** là mô hình tốt nhất):
+
+| Tài sản | Horizon | EGARCH-t | GARCH-t | GJR-t | EWMA | Trượt 60 ngày |
+|---|---|---:|---:|---:|---:|---:|
+| Bitcoin | 1 ngày | 2,727 | 2,724 | 2,703 | **2,620** | 2,695 |
+| | 5 ngày | 4,366 | 4,363 | 4,345 | **4,275** | 4,345 |
+| Vàng SJC | 1 ngày | 1,518 | **1,169** | 1,224 | 1,327 | 1,661 |
+| | 5 ngày | 3,147 | **2,878** | 2,914 | 3,108 | 3,438 |
+| VN-Index | 1 ngày | **1,525** | 1,577 | 1,538 | 1,614 | 1,660 |
+| | 5 ngày | 3,232 | **3,231** | 3,263 | 3,274 | 3,299 |
+
+- **VN-Index: EGARCH-t dự báo tốt nhất.** Mô hình đứng đầu cả ba hàm tổn thất ở horizon 1 ngày, và đứng đầu MSE, MAE ở horizon 5 ngày. Tuy vậy, chênh lệch với benchmark chưa có ý nghĩa ở mức 5% (Diebold–Mariano, mọi p ≥ 0,08), vì mẫu ngoài chỉ có 247 ngày. Hệ số Mincer–Zarnowitz b = 0,62, tức dự báo phản ứng mạnh hơn mức cần thiết.
+- **Bitcoin: EWMA tốt nhất, EGARCH-t kém nhất.** EWMA tốt hơn EGARCH-t có ý nghĩa thống kê ở horizon 1 ngày (QLIKE p = 0,019; MSE p < 0,001). EWMA cũng là mô hình duy nhất không bị Mincer–Zarnowitz bác bỏ (p = 0,085). Ba mô hình GARCH họ t gần như ngang nhau.
+- **Vàng SJC: GARCH-t tốt nhất, EGARCH-t kém có ý nghĩa.** GARCH-t tốt hơn EGARCH-t ở horizon 1 ngày (QLIKE p = 0,010), GJR-t cũng vậy (p = 0,031). EGARCH-t phản ứng quá mạnh với cú sốc: sau biến động tháng 4/2025, σ dự báo vọt lên 8,7% trong khi GJR-t chỉ khoảng 4% và EWMA dưới 3%. Mincer–Zarnowitz cho b = 0,05, gần như không có thông tin. Điều này nhất quán với phần dư chuẩn hóa có phương sai chỉ 0,5 ở Bước 1.
+- **Tham số EGARCH không ổn định theo thời gian** (`egarch_parameters_by_window.csv`) và đây là nguyên nhân chính:
+  - Bitcoin: trong 9 cửa sổ đầu (đến 05/2025), α < 0. Khi đó cú sốc càng lớn thì σ kỳ sau càng giảm, ngược với kết quả toàn mẫu α = 0,20. Hệ quả là σ dự báo tăng dần trong giai đoạn yên tĩnh rồi nhảy bậc mỗi lần ước lượng lại. Nghiệm này có log-likelihood cao nhất qua nhiều điểm khởi tạo, nên không phải lỗi tối ưu.
+  - SJC: α dao động từ −0,12 đến 0,92 giữa các cửa sổ.
+  - VN-Index: ổn định, α từ 0,25 đến 0,29 và γ luôn âm (−0,17 đến −0,12), tức hiệu ứng đòn bẩy giữ nguyên ngoài mẫu.
+- R² của Mincer–Zarnowitz thấp (dưới 0,15) là bình thường khi proxy là bình phương lợi suất ngày.
+
+**Backtest VaR/ES 1 ngày** (từ EGARCH-t; số vi phạm thực tế / kỳ vọng):
+
+| Tài sản | Cách tính | VaR 95% | Christoffersen CC (p) | VaR 99% | Traffic light 99% (toàn bộ / 250 ngày cuối) | ES bị bác bỏ? |
+|---|---|---:|---:|---:|---|---|
+| Bitcoin | Student-t | 29 / 29,8 | 0,46 | 5 / 6,0 | Green / Green | Không |
+| | FHS | 30 / 29,8 | 0,52 | 7 / 6,0 | Green / Green | Không |
+| Vàng SJC | Student-t | 28 / 20,5 | **< 0,001** | 7 / 4,1 | Green / **Yellow** | Không |
+| | FHS | 29 / 20,5 | **< 0,001** | 7 / 4,1 | Green / **Yellow** | Không |
+| VN-Index | Student-t | 19 / 12,4 | **0,030** | 4 / 2,5 | Green / Green | ES 95%: Z₂ p = 0,044 |
+| | FHS | 18 / 12,4 | **0,032** | 2 / 2,5 | Green / Green | Không |
+
+- **Bitcoin đạt mọi kiểm định** ở cả hai cách tính. Số vi phạm khớp kỳ vọng, các vi phạm không tập trung, ES không bị bác bỏ. Như vậy dù σ của EGARCH dự báo kém hơn EWMA, phân phối t với ν ≈ 3 vẫn cho mức VaR phù hợp. Ở mức 99%, ES Student-t (trung bình 11,3%) thận trọng hơn nhiều so với FHS (7,8%).
+- **Vàng SJC: vi phạm tập trung thành cụm.** Tần suất vi phạm VaR 95% cao hơn kỳ vọng (6,8–7,1% so với 5%), nhưng Kupiec chưa bác bỏ (p = 0,10 và 0,07). Kiểm định độc lập bác bỏ rất mạnh (p < 0,001), với 8 cặp ngày vi phạm liên tiếp. VaR phản ứng chậm khi SJC chuyển sang giai đoạn biến động mạnh (03/2026 và 06/2026). VaR 99% có 7 vi phạm trong 250 ngày cuối, rơi vào vùng vàng.
+- **VN-Index: VaR 95% hơi thấp.** Có 18–19 vi phạm so với 12,4 kỳ vọng, và kiểm định có điều kiện bác bỏ ở mức 5%. ES 95% Student-t bị Z₂ bác bỏ (p = 0,044), tức đánh giá thấp tổn thất đuôi. Ở mức 99%, cả hai cách tính đều đạt, nhưng với 247 ngày chỉ kỳ vọng 2,5 vi phạm nên kiểm định có độ mạnh thấp.
+- **Student-t và FHS cho kết quả backtest gần như giống nhau** ở cả ba tài sản. Vấn đề của SJC và VN-Index nằm ở σ dự báo (phản ứng chậm, vi phạm theo cụm) nhiều hơn là ở giả định phân phối.
+
+![Backtest VaR của Bitcoin](figures/step4_forecast_var/var_backtest_btc.png)
+![Dự báo biến động của vàng SJC](figures/step4_forecast_var/volatility_forecast_sjc.png)
+
+#### Kiểm định trên dữ liệu mới 08–11/2026 (holdout)
+
+Giai đoạn holdout **yên tĩnh hơn rõ rệt** so với 250 ngày trước đó. Độ lệch chuẩn lợi suất ngày của Bitcoin là 2,22% so với 2,41%, của vàng SJC 0,69% so với 1,39%, của VN-Index 0,95% so với 1,34%. Đây là phép thử khó cho các mô hình phản ứng mạnh với cú sốc.
+
+| Tài sản | Horizon | EGARCH-t | GARCH-t | GJR-t | EWMA | Trượt 60 ngày |
+|---|---|---:|---:|---:|---:|---:|
+| Bitcoin | 1 ngày | 2,609 | 2,611 | **2,599** | 2,700 | 2,723 |
+| | 5 ngày | 4,239 | 4,273 | **4,234** | 4,524 | 4,398 |
+| Vàng SJC | 1 ngày | 0,772 | **0,369** | 0,401 | 0,398 | 0,465 |
+| | 5 ngày | 2,478 | 1,978 | 1,990 | **1,956** | 2,015 |
+| VN-Index | 1 ngày | 1,029 | 1,018 | 1,008 | 0,999 | **0,989** |
+| | 5 ngày | 2,625 | 2,604 | 2,597 | 2,593 | **2,584** |
+
+*QLIKE trung bình trên các ngày holdout, càng thấp càng tốt.*
+
+- **Bitcoin: kết luận đảo chiều theo hướng có lợi cho EGARCH-t.** Ở phần A, EGARCH-t kém nhất và thua EWMA có ý nghĩa. Trên holdout, EGARCH-t gần ngang GJR-t và tốt hơn EWMA, phương sai trượt, nhưng chưa có ý nghĩa ở horizon 1 ngày. Ở horizon 5 ngày, EGARCH-t tốt hơn GARCH-t có ý nghĩa theo MSE (p = 0,038). Lý do nằm ở bảng tham số: trong các cửa sổ dùng cho holdout, α của EGARCH ổn định trong khoảng 0,198–0,216, không còn âm như 9 cửa sổ đầu ở phần A.
+- **Vàng SJC: EGARCH-t kém nhất, lần này có ý nghĩa với mọi benchmark** (QLIKE 1 ngày p ≤ 0,027; MSE p ≤ 0,001). Mô hình có α ≈ 0,50 nên sau mỗi cú sốc nhỏ, σ dự báo vẫn cao gấp 1,5–2 lần các mô hình khác trong suốt giai đoạn yên tĩnh. Kết quả của phần A được xác nhận.
+- **VN-Index: lợi thế của EGARCH-t ở phần A không lặp lại.** EGARCH-t đứng cuối trên holdout, nhưng ở horizon 1 ngày không chênh lệch nào có ý nghĩa (mọi p ≥ 0,14). Ở horizon 5 ngày, phương sai trượt tốt hơn EGARCH-t có ý nghĩa (QLIKE p = 0,024; MSE p = 0,013). Tham số vẫn ổn định (α ≈ 0,23, γ ≈ −0,12), nên đây là mô hình phản ứng quá mạnh trong giai đoạn yên tĩnh chứ không phải mô hình bị gãy.
+- **Mincer–Zarnowitz:** với SJC và VN-Index, hệ số b âm ở hầu hết mô hình. Khi biến động gần như phẳng, không mô hình nào bắt được dao động ngày qua ngày, nên kiểm định này ít thông tin trên holdout.
+
+**Backtest VaR/ES 1 ngày trên holdout:** số vi phạm thực tế / kỳ vọng, cách tính Student-t (FHS trong ngoặc).
+
+| Tài sản | VaR 95% | VaR 99% | Kiểm định bị bác bỏ ở mức 5% |
+|---|---:|---:|---|
+| Bitcoin | 7 (10) / 5,6 | 0 (0) / 1,1 | Không |
+| Vàng SJC | 5 (6) / 4,7 | 0 (2) / 0,9 | Không |
+| VN-Index | 5 (3) / 3,9 | 0 (0) / 0,8 | Không |
+
+- **VaR và ES đạt mọi kiểm định trên cả ba tài sản**, kể cả SJC và VN-Index vốn có vi phạm theo cụm ở phần B. Các vi phạm VaR 95% không còn tập trung. VaR 99% Student-t không có vi phạm nào.
+- Đáng chú ý ở SJC: σ của EGARCH-t dự báo quá cao, nhưng VaR vẫn đúng tần suất. Với ν ≈ 2,25, phân vị 95% của phân phối t chuẩn hóa nhỏ hơn nhiều so với phân phối chuẩn, nên hai sai lệch bù trừ nhau. σ của mô hình này vì thế nên hiểu như một tham số thang đo, không nên đọc trực tiếp như độ lệch chuẩn.
+- FHS cho Bitcoin 10 vi phạm VaR 95% so với 5,6 kỳ vọng (Kupiec p = 0,084), sát ngưỡng bác bỏ. Student-t ổn định hơn.
+- **Độ mạnh rất thấp:** VaR 99% chỉ kỳ vọng khoảng 1 vi phạm trong mỗi chuỗi holdout. "Không bác bỏ" ở đây không đủ để khẳng định mô hình đúng, chỉ cho thấy không có dấu hiệu sai lệch lớn.
+
+![Dự báo biến động của vàng SJC trên holdout](figures/step4_forecast_var/holdout/volatility_forecast_sjc.png)
+
 ## 7. Ý nghĩa thực tiễn
 
 - **Đa dạng hóa danh mục:** tương quan rất yếu và TCI phần lớn thời gian thấp cho thấy kết hợp Bitcoin, vàng SJC và cổ phiếu Việt Nam có thể đem lại lợi ích đa dạng hóa. Tuy nhiên lợi ích này **tồn tại nhưng không bất biến**: TCI có giai đoạn trên 20% và hướng truyền rủi ro có thể đảo chiều. Phân bổ tài sản không nên chỉ dựa trên tương quan trung bình.
@@ -303,6 +422,7 @@ Phần này tóm tắt nhận xét sau output trong hai notebook. Nhận xét đ
   - *Vàng SJC:* là nguồn truyền rủi ro đáng chú ý ở cuối mẫu, cần theo dõi khi đánh giá rủi ro ngắn hạn hiện tại. Biến động của SJC rất dai dẳng và có cực đại lớn nhất, nên cần theo dõi xu hướng biến động đủ dài thay vì phản ứng theo một ngày. Vai trò phòng vệ của vàng cần được đánh giá theo từng giai đoạn.
   - *Bitcoin:* biến động trung bình cao nhất và đã là bên truyền rủi ro ở nhiều giai đoạn. Cần áp dụng hạn mức vị thế và tỷ trọng phù hợp với khả năng chịu rủi ro, không chỉ dựa vào lợi suất kỳ vọng.
 - **Đánh giá rủi ro ở nhiều horizon:** TCI tăng khi horizon dài hơn (TVP-VAR: 5,0% → 7,9% → 13,3% tại H = 5, 10, 20). Lợi ích đa dạng hóa trong ngắn hạn có thể giảm khi các cú sốc tích lũy theo thời gian.
+- **Chọn mô hình dự báo rủi ro theo từng tài sản:** không có mô hình biến động nào thắng ổn định qua cả hai giai đoạn kiểm định. Với vàng SJC, GARCH-t hoặc EWMA dự báo σ tốt hơn EGARCH-t ở cả hai giai đoạn. Với Bitcoin và VN-Index, xếp hạng đảo chiều giữa giai đoạn biến động mạnh và giai đoạn yên tĩnh. Ngược lại, VaR/ES 1 ngày từ EGARCH-t đạt mọi backtest trên dữ liệu mới. Khi dùng cho quản trị rủi ro, nên theo dõi đồng thời vài mô hình và kiểm tra lại VaR 95% khi biến động chuyển trạng thái.
 - **Giám sát liên thị trường:** tổ chức tài chính và cơ quan quản lý có thể dùng $TCI_t$ và $NET_t$ làm chỉ báo bổ sung, kết hợp với VaR, Expected Shortfall và kiểm định sức chịu đựng. Các chỉ báo này không thay thế các chỉ tiêu giám sát ổn định tài chính hiện hành.
 
 Các kết luận phản ánh mẫu dữ liệu và đặc tả mô hình của dự án. Chúng hỗ trợ phân tích và quản trị rủi ro, **không phải khuyến nghị đầu tư**.
@@ -321,6 +441,12 @@ Các kết luận phản ánh mẫu dữ liệu và đặc tả mô hình của 
 - **Tương quan động chưa được khẳng định:** kiểm định tính hằng không bác bỏ CCC. Đường DCC của SJC–VN-Index chỉ mang tính mô tả.
 - **Không phải quan hệ nhân quả:** "truyền" và "nhận" là khái niệm trong khuôn khổ phân rã phương sai sai số dự báo, không xác định cơ chế nhân quả kinh tế.
 - **Thiếu biến vĩ mô:** chưa đưa lãi suất, lạm phát, tỷ giá, giá vàng thế giới hay chỉ số quốc tế vào mô hình, nên chưa giải thích được nguyên nhân kinh tế của các thay đổi.
+- **Dự báo ngoài mẫu (Bước 4):**
+  - Proxy biến động là bình phương lợi suất ngày, rất nhiễu. Kiểm định Diebold–Mariano vì vậy có độ mạnh thấp, nhất là với VN-Index (247 ngày).
+  - VaR 99% của VN-Index chỉ kỳ vọng 2,5 vi phạm, nên kiểm định Kupiec và Christoffersen gần như không phân biệt được mô hình tốt và mô hình kém.
+  - Bậc ARMA/EGARCH được cố định theo kết quả chọn trên toàn mẫu ở Bước 1, nên không hoàn toàn ngoài mẫu. Chỉ tham số được ước lượng lại theo thời gian.
+  - Dự báo 5 ngày của EGARCH dùng bootstrap, khác cách tính công thức đóng của GARCH và GJR. Proxy 5 ngày bỏ qua phần trung bình ARMA cộng dồn.
+  - Holdout chỉ dài 77–112 ngày và rơi vào một giai đoạn yên tĩnh, nên chỉ đại diện cho một trạng thái thị trường. Dữ liệu holdout được tạo bằng pipeline vào ngày 22/11/2026; nguồn có thể điều chỉnh dữ liệu về sau.
 - **Phương pháp không mới:** ARMA–EGARCH, DCC và connectedness đều là phương pháp phổ biến. Đóng góp chính của dự án là áp dụng và đối chiếu chúng cho ba thị trường trong bối cảnh Việt Nam.
 
 ## 9. Các quyết định phân tích
@@ -336,6 +462,12 @@ Những lựa chọn dưới đây ảnh hưởng trực tiếp đến kết lu�
 | **Giữ chuỗi biến động ở dạng mức** | ADF và PP bác bỏ nghiệm đơn vị. KPSS mức của SJC mâu thuẫn, nhưng KPSS có xu hướng và Zivot–Andrews (điểm gãy 04/06/2024) cho thấy nhiều khả năng do thay đổi cấu trúc. | Điểm gãy chưa được đưa trực tiếp vào mô hình. |
 | **Chuyển từ VAR tĩnh sang TVP-VAR(1)** | VAR(9) chỉ cho một cấu trúc trung bình, với VN-Index là bên truyền ròng duy nhất. TVP-VAR cho thấy vai trò truyền và nhận thay đổi theo thời gian. | Độ trễ 1 chọn theo BIC/HQIC đơn giản hơn nhiều so với độ trễ 9 mà VAR tĩnh cần để hết tự tương quan phần dư. Có 14 ngày bất ổn cục bộ. |
 | **Đánh giá độ vững theo dấu của NET** | Mức TCI phụ thuộc horizon và κ, nên tiêu chí là vai trò truyền và nhận có giữ nguyên qua 6 đặc tả hay không. | Kết luận vững về chiều trung bình, không phải về mức TCI tuyệt đối. |
+| **Bước 4 dùng lịch riêng và đặc tả Model 1** | VaR/ES là rủi ro của từng tài sản, nên dùng toàn bộ quan sát của tài sản đó thay vì 747 ngày chung. | VN-Index chỉ có 247 ngày ngoài mẫu. |
+| **Cửa sổ mở rộng 500 quan sát, ước lượng lại mỗi 20 quan sát** | 500 quan sát đủ để ước lượng EGARCH-t ổn định hơn, mà vẫn để lại phần ngoài mẫu cho cả ba tài sản. Ước lượng lại mỗi 20 ngày giữ thời gian chạy ngắn. | Tham số có thể lỗi thời đến 20 ngày. |
+| **Ước lượng mỗi cửa sổ từ nhiều điểm khởi tạo** | Điểm khởi tạo mặc định của `arch` có lúc đưa EGARCH vào nghiệm suy biến, làm dự báo bùng nổ. Các điểm khởi tạo thêm chỉ dùng thông tin trong cửa sổ, gồm tham số của cửa sổ trước, nên không nhìn trước dữ liệu. | Tốn thêm thời gian chạy. |
+| **Dự báo nhiều bước của EGARCH bằng bootstrap** | Với sai số Student-t, phương sai nhiều bước của EGARCH không hữu hạn. Mô phỏng từ phân phối t cho kết quả trung bình không ổn định (có ngày lên tới hàng tỷ). | Dự báo 5 ngày của EGARCH phụ thuộc phân phối thực nghiệm trong mẫu. |
+| **Holdout: chạy tiếp walk-forward, không đóng băng tham số** | Kiểm định cả quy trình đúng như khi dùng thật: mô hình tiếp tục được ước lượng lại mỗi 20 quan sát. Đặc tả và mọi tham số cấu hình được cố định trước khi xem dữ liệu mới. | Không tách được phần đóng góp của việc ước lượng lại so với tham số tại 01/08/2026. |
+| **Chỉ lưu σ và VaR/ES theo ngày, không lưu dự báo benchmark** | Dự báo EWMA và phương sai trượt cho phép khôi phục bình phương lợi suất đầu vào, vốn không được tái phân phối. | Người đọc không vẽ lại được hình so sánh benchmark nếu không có dữ liệu. |
 
 ## 10. Lịch sử dự án
 

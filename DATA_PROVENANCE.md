@@ -111,6 +111,18 @@ Thông tin dưới đây được kiểm kê ngày `2026-08-14`, mô tả phiên
 
 VN-Index kết thúc tại ngày giao dịch gần nhất trước ngày kết thúc cấu hình. Bitcoin có dữ liệu hằng ngày, trong khi vàng và VN-Index chỉ có dữ liệu vào các ngày tương ứng có quan sát.
 
+### Dữ liệu holdout (Bước 4C)
+
+Dữ liệu sau ngày kết thúc mẫu gốc, dùng để kiểm định ngoài mẫu thật ở Bước 4C. Được tạo ngày `2026-11-22` bằng pipeline commit [`0afe7f3`](https://github.com/htrang22/goldvn-data-pipeline/commit/0afe7f32ef925e4f4751442df1a69a84bed03774) với `--start-date 2026-07-20 --end-date 2026-11-21`. Giá vàng SJC TPHCM được lấy bằng `src/pnj_gold_parser.py` (chế độ `snapshot`). Các file này cũng không đi kèm repository.
+
+| File | Số quan sát | Khoảng ngày | Số ngày sau 01/08/2026 |
+| --- | ---: | --- | ---: |
+| `holdout-bitcoin-vnd-returns.csv` | 125 | `2026-07-20` – `2026-11-21` | 112 |
+| `holdout-gold-returns.csv` | 106 | `2026-07-20` – `2026-11-21` | 94 |
+| `holdout-vnindex-returns.csv` | 87 | `2026-07-20` – `2026-11-20` | 77 |
+
+Đoạn `2026-07-20` – `2026-08-01` chồng lên mẫu gốc và được dùng để đối chiếu. Mọi ngày trong đoạn này có mặt ở cả hai bộ dữ liệu, và giá, tỷ giá, lợi suất trùng khớp hoàn toàn. Bước 4 chỉ lấy các ngày sau `2026-08-01`. Lợi suất của ngày mới đầu tiên được tính từ giá cuối cùng của mẫu gốc.
+
 ## 7. Xác nhận phiên bản dữ liệu
 
 Mỗi file được ghi kèm một mã SHA-256, có thể hiểu là dấu vân tay kỹ thuật số của file. Mã này giúp người sử dụng xác nhận rằng dataset họ tạo lại giống chính xác với phiên bản được sử dụng trong nghiên cứu.
@@ -122,6 +134,9 @@ Nếu nội dung file thay đổi, kể cả chỉ một giá trị, mã SHA-256
 | `3y-bitcoin-vnd-returns.csv` | `0d868a7ca91edc3a2015c18fbc76d992aa42f1cc0d4c6c6ef5565ec73990750c` |
 | `3y-gold-returns.csv` | `9a1cd7c701a29932ecff2f61d76f688f941f4487bc07bf3327648c5a873781ce` |
 | `3y-vnindex-returns.csv` | `e802bdb304789e01adac74a2a7d50c23704eac211d3e8136ce3e9d80b81128b4` |
+| `holdout-bitcoin-vnd-returns.csv` | `82860bd1112f3806200afde8f48e172c51a9525f983fcef45ff3425a34a1f600` |
+| `holdout-gold-returns.csv` | `9e76490ac0f9445208bc941036edfaaef112515f1a28e4b9049ce7cfb2aa6c3a` |
+| `holdout-vnindex-returns.csv` | `2f234f90ce179e0287c3dc77f57f020c20f8c8e78152a835606205c89ff3af61` |
 
 ## 8. Dữ liệu vàng và quyền sử dụng
 
