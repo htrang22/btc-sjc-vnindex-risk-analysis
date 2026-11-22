@@ -1,4 +1,5 @@
-"""Run the full analysis: Step 1 ARMA-EGARCH -> Step 2 CCC/DCC -> Step 3 TVP-VAR.
+"""Run the full analysis: Step 1 ARMA-EGARCH -> Step 2 CCC/DCC -> Step 3 TVP-VAR
+-> Step 4 volatility forecasts and VaR/ES backtests.
 
 Usage (from the repository root):
 
@@ -13,6 +14,7 @@ import sys
 import step1_arma_egarch
 import step2_dcc_garch
 import step3_connectedness
+import step4_forecast_var
 
 
 def main() -> None:
@@ -26,6 +28,7 @@ def main() -> None:
     sys.argv = sys.argv[:1]
     step2_dcc_garch.main()
     step3_connectedness.main()
+    step4_forecast_var.main()
 
 
 if __name__ == "__main__":
